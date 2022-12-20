@@ -9,6 +9,7 @@ import csv
 import sys
 import xlwt # from http://www.python-excel.org/
 import xlsxwriter
+from PIL import Image
 
 # ===========================================================
 # Selenium set up (running from jobs.py) -- testing file alone
@@ -25,27 +26,18 @@ import xlsxwriter
 from custom_functions import Scraper, mysqlalchemy
 from custom_functions import utc_converter
 # ===========================================================
-
+from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import selenium.webdriver.support.expected_conditions as ec
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 import datetime as DT
 import mysql.connector as mysql
-import webdriver_manager
 
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.utils import ChromeType
-
-driver = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
-
-# Route to temp folder
 HOME_DIR = '/home/pi/Desktop/CodeFiles'
 TEMP = '/home/pi/Desktop/CodeFiles/temp'
 FINAL_FILENAME = 'mktgforecast.csv'
 FINAL_FILEPATH = os.path.join(TEMP, FINAL_FILENAME)
-
 
 # Clear the temp folder
 for root, directory, files in os.walk(TEMP):
@@ -61,24 +53,23 @@ try:
 
     # Login to Handshake
     scraper.get('https://app.joinhandshake.com/login')
-    # (scraper.find_element_by_xpath('//*[@id="email-address-identifier"]')).send_keys('recruitersupport@byu.edu')  # USERNAME
-    # (scraper.find_element_by_xpath('//*[@id="ui-id-1"]/div[3]/form/div/button')).click()
-    # (scraper.find_element_by_xpath('//*[@id="password"]')).send_keys('BCCrecruiter1!')  # PASSWORD
-    # (scraper.find_element_by_xpath('/html/body/div/div[2]/div/form/div/div/button')).click()
-    (scraper.find_element_by_xpath('//*[@id="email-address-identifier"]')).send_keys('recruitersupport@byu.edu')  # USERNAME
-    (scraper.find_element_by_xpath('//*[@id="ui-id-1"]/div[3]/form/div/button')).click()
-    (scraper.find_element_by_xpath('//*[@id="password"]')).send_keys('BCCrecruiter1!')  # PASSWORD
-    (scraper.find_element_by_xpath('/html/body/div[1]/div[2]/div/form/div/div/button')).click()
-    print("3")
+    # (scraper.find_element('xpath', '//*[@id="email-address-identifier"]')).send_keys('recruitersupport@byu.edu')  # USERNAME
+    # (scraper.find_element('xpath', '//*[@id="ui-id-1"]/div[3]/form/div/button')).click()
+    # (scraper.find_element('xpath', '//*[@id="password"]')).send_keys('BCCrecruiter1!')  # PASSWORD
+    # (scraper.find_element('xpath', '/html/body/div/div[2]/div/form/div/div/button')).click()
+    (scraper.find_element('xpath', '//*[@id="email-address-identifier"]')).send_keys('recruitersupport@byu.edu')  # USERNAME
+    (scraper.find_element('xpath', '//*[@id="ui-id-1"]/div[3]/form/div/button')).click()
+    (scraper.find_element('xpath', '//*[@id="password"]')).send_keys('BCCrecruiter1!')  # PASSWORD
+    (scraper.find_element('xpath', '/html/body/div[1]/div[2]/div/form/div/div/button')).click()
     # If necessary, redirect out of a Employer or Student Account
     try:
-        scraper.find_element_by_xpath('//*[@id="ui-id-1"]/div[1]/div[1]/a')
+        scraper.find_element('xpath', '//*[@id="ui-id-1"]/div[1]/div[1]/a')
         scraper.get('https://app.joinhandshake.com/user_switcher/options')
-        (scraper.find_element_by_xpath('//*[@id="main"]/div/div/div/a')).click()
+        (scraper.find_element('xpath', '//*[@id="main"]/div/div/div/a')).click()
     except NoSuchElementException:
         pass
     try:
-        scraper.find_element_by_xpath('//*[@id="main"]/div[2]/div/div[1]/div/div/div[1]/div[1]/div/div[1]/div/div[2]/h1')
+        scraper.find_element('xpath', '//*[@id="main"]/div[2]/div/div[1]/div/div/div[1]/div[1]/div/div[1]/div/div[2]/h1')
         scraper.get('https://app.joinhandshake.com/user_switcher/options')
         (scraper.find_element_by_xpath('//*[@id="main"]/div/div/div/a')).click()
     except NoSuchElementException:
@@ -99,8 +90,14 @@ try:
         scraper.get(scraperurl)
         # THE LINE OF CODE BELOW IS WHERE A URL CORRESPONDING TO THE SEARCH YOU WANT TO PULL AS A REPORT IS PUT
         print('Navigated to the jobs page on Handshake')
+        #WebDriverWait(scraper, 20).until(ec.element_to_be_clickable((By.XPATH, """//*[@id="main"]/div/div/div[1]/div/form/div[1]/div/div[1]/div[2]/div/button"""))).click()                                                                          
         sleep(20)
+        
+        #scraper.find_element_by_link_text('Download Job Postings').click()
         wait.until(ec.element_to_be_clickable((By.XPATH, '//*[@id="main"]/div/div/div[1]/div/form/div[1]/div/div[1]/div[2]/div/button'))).click()
+        # element = scraper.find_element('xpath', '//*[@id="main"]/div/div/div[1]/div/form/div[1]/div/div[1]/div[2]/div/button')
+        # element.screenshot("testmktg.png")
+        # element.click()
         print('Began downloading the jobs report')
         # sleep(60)
         count = 0
@@ -109,7 +106,7 @@ try:
             sleep(1)
         if count == 6000:
             raise FileNotFoundError('The report could not be downloaded')
-            break
+        break
 
     scraper.close()
 

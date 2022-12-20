@@ -28,9 +28,11 @@ class Scraper:
         # chromedriver = "C:/Users/jonah/Desktop/BCC/Data/chromedriver/chromedriver.exe"
 
         # For Raspberry Pi
-        chromedriver = '/usr/lib/chromium-browser/chromedriver'
+        # maybe try just /usr/bin? it gives a different error. dont know which error is better tbh
+        chromedriver = '/usr/bin/chromedriver'
 
         os.environ["webdriver.chrome.driver"] = chromedriver
+        # self.driver = webdriver.Chrome(options=options, executable_path=chromedriver)
         self.driver = webdriver.Chrome(options=options, executable_path=chromedriver)
 
 
