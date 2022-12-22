@@ -20,15 +20,17 @@ class Scraper:
         # Change this to watch the webscrapers work on your screen
         options.add_argument('--headless')
 
-        prefs = {"download.default_directory": os.path.join(dir_path, 'temp')}
-        options.add_experimental_option("prefs", prefs)
+        # prefs = {"download.default_directory": os.path.join(dir_path, 'temp')}
+        # options.add_experimental_option("prefs", prefs)
+
+        prefs = {'download.default_directory' : '/home/pi/Desktop/CodeFiles/FridayForecasts/temp'}
+        options.add_experimental_option('prefs', prefs)
 
         # For local computers -- include the location of your chromedriver on your local computer
         # chromedriver = '/Users/haydenthomas/Documents/Hayden/01 School/chromedriver'
         # chromedriver = "C:/Users/jonah/Desktop/BCC/Data/chromedriver/chromedriver.exe"
 
         # For Raspberry Pi
-        # maybe try just /usr/bin? it gives a different error. dont know which error is better tbh
         chromedriver = '/usr/bin/chromedriver'
 
         os.environ["webdriver.chrome.driver"] = chromedriver
@@ -122,3 +124,12 @@ def mysqlalchemy(charset):
     #alchemyengine = create_engine(f"mysql+pymysql://{user}:{pw}@{host}/{db}?charset=utf8")
 
     return alchemyengine
+
+def mysqlcursor():
+    db_opts = {
+        'user': 'iscareer_operations',
+        'password': 'BCCRecruiter1!',
+        'host': '159.65.98.126',
+        'database': 'iscareer_operations'
+    }
+    return db_opts
